@@ -1,0 +1,5 @@
+pandas
+pyspark         # + JAVA needs to be installed manually
+matplotlib
+numpy
+scipy
