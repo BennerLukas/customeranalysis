@@ -19,7 +19,7 @@ class DataPreparation:
         self.spark, self.sc = self.create_spark_session()
 
     def set_logger(self, name, mode=logging.INFO):
-        log_format = ('[%(asctime)s] [%(levelname)-8s] [%(name)-12s] %(message)s')
+        log_format = ('[DataExploration][%(asctime)s] [%(levelname)-8s][%(name)-12s] %(message)s')
 
         logging.basicConfig(
             level=mode,
@@ -162,6 +162,8 @@ class ClusterCustomer:
         self.data = DataPreparation()
         self.log = self.data.set_logger("K-Means")
         self.log.info("Finished Init")
+        self.features = ("avg_turnover_per_session", "avg_events_per_session", "sum_turnover", "count_session")
+        # features = ("sum_views", "sum_turnover", "sum_purchases", "sum_carts", "count_session")
 
     def prep_data(self, read_existing=True):
         if read_existing is False:
@@ -174,6 +176,7 @@ class ClusterCustomer:
             self.log.info("Read customer profile from CSV")
             sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,
                                                             inferSchema=True)
+            sdf_customer_profile.printSchema()
 
         (trainingData, testData, devData) = sdf_customer_profile.where(
             sdf_customer_profile["avg_turnover_per_session"] > 0).randomSplit([0.6, 0.3, 0.01], seed=123)
@@ -183,7 +186,9 @@ class ClusterCustomer:
     def vectorize(self, dataset, features=None):
         self.log.info("Start vectorizing")
         if features is None:
-            features = ("sum_views", "sum_turnover", "sum_purchases", "sum_carts", "count_session")
+            features = self.features
+        else:
+            self.features = features
 
         assembler = VectorAssembler(inputCols=features, outputCol="features")
 
@@ -200,7 +205,8 @@ class ClusterCustomer:
         model = kmeans.fit(v_trainData)
 
         self.log.info("Make predictions")
-        predictions = model.transform(v_testData)
+        model.setPredictionCol("newPrediction")
+        predictions = model.predict(v_testData)
 
         # Evaluate clustering by computing Silhouette score
         evaluator = ClusteringEvaluator()
@@ -223,6 +229,8 @@ class ClusterCustomer:
         self.log.info("Save Model")
         model.write().overwrite().save("src/data/models/kmeans")
 
+        # self.visualize(model, predictions)
+
         return model, silhouette, centers, predictions, cost
 
     def evaluate(self, trainData, testData):
@@ -235,23 +243,36 @@ class ClusterCustomer:
         df_cost = pd.DataFrame(cost[2:])
         df_cost.columns = ["cost"]
         new_col = [2, 3, 4, 5, 6, 7, 8, 9]
-        df_cost.insert(0, 'cluster', new_col)
+        df_cost.insert(0, 'k', new_col)
 
-        fig = px.line(df_cost.cluster, df_cost.cost, title="Elbow Curve")
+        fig = px.line(df_cost.k, df_cost.cost, title="Elbow Curve", labels={"k": "Number of K",
+                                                                            "cost": "Cost"})
+
         fig.show()
         return df_cost
-
 
     def gaussian_mixture(self, trainData, testData):
         pass
 
-    def visualize(self):
-        pass
+    def visualize(self, model, predictions):
+        predictions.show()
+
+        centers = pd.DataFrame(model.clusterCenters(), columns=self.features)
+        print(centers.head())
+
+        fig = px.scatter(centers, x="avg_events_per_session", y="avg_turnover_per_session")
+        predictions = predictions.withColumn("predicted_group", predictions["prediction"].cast(pyspark.sql.types.StringType()))
+
+        fig2 = px.scatter(predictions.toPandas(), x="avg_events_per_session", y="avg_turnover_per_session", color="predicted_group")
+
+        fig2.show()
+        fig.show()
 
 
 if __name__ == "__main__":
     customer = ClusterCustomer()
     train, test, dev = customer.prep_data(True)
     result = customer.evaluate(train, test)
+    # result = customer.k_means(train, test)
     # print(result)
     pass
