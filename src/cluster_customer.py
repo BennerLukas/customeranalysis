@@ -1,13 +1,11 @@
-import os
 import logging
-import sys
 import pyspark
 import pandas as pd
 import pyspark.sql.functions as f
 import pyspark.sql.types as T
 import plotly.express as px
 import plotly.graph_objects as go
-
+import numpy as np
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
 from pyspark.ml.clustering import GaussianMixture
@@ -20,13 +18,13 @@ class DataPreparation:
         self.log = self.set_logger("Data-Prep")
         self.spark, self.sc = self.create_spark_session()
 
-    def set_logger(self, name):
+    def set_logger(self, name, mode=logging.INFO):
         log_format = ('[%(asctime)s] [%(levelname)-8s] [%(name)-12s] %(message)s')
 
         logging.basicConfig(
-            level=logging.INFO,
+            level=mode,
             format=log_format,
-            filename=('debug.log'),
+            filename=('src/data/log/debug.log'),
         )
 
         logging.debug('debug')
@@ -46,17 +44,17 @@ class DataPreparation:
 
     def create_spark_session(self):
         self.log.info("Create Spark Session")
-        spark = pyspark.sql.SparkSession.builder.appName("app1").getOrCreate()
-        # spark = pyspark.sql.SparkSession \
-        #     .builder \
-        #     .master("local") \
-        #     .appName("app_great") \
-        #     .config("spark.executor.memory", f"16g") \
-        #     .config("spark.driver.memory", f"16g") \
-        #     .config("spark.memory.offHeap.enabled", True) \
-        #     .config("spark.memory.offHeap.size", f"16g") \
-        #     .config("spark.sql.debug.maxToStringFields", f"16") \
-        #     .getOrCreate()
+        # spark = pyspark.sql.SparkSession.builder.appName("app1").getOrCreate()
+        spark = pyspark.sql.SparkSession \
+            .builder \
+            .master("local") \
+            .appName("app_great") \
+            .config("spark.executor.memory", f"16g") \
+            .config("spark.driver.memory", f"16g") \
+            .config("spark.memory.offHeap.enabled", True) \
+            .config("spark.memory.offHeap.size", f"16g") \
+            .config("spark.sql.debug.maxToStringFields", f"16") \
+            .getOrCreate()
         sc = spark.sparkContext
         return spark, sc
 
@@ -174,7 +172,7 @@ class ClusterCustomer:
             sdf_customer_profile = self.data.make_customer_profiles(sdf_session_agg)
         else:
             self.log.info("Read customer profile from CSV")
-            sdf_customer_profile = self.data.spark.read.csv("data/customer_profile_new.csv", header=True,
+            sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,
                                                             inferSchema=True)
 
         (trainingData, testData, devData) = sdf_customer_profile.where(
@@ -183,7 +181,7 @@ class ClusterCustomer:
         return trainingData, testData, devData
 
     def vectorize(self, dataset, features=None):
-        self.log("Start vectorizing")
+        self.log.info("Start vectorizing")
         if features is None:
             features = ("sum_views", "sum_turnover", "sum_purchases", "sum_carts", "count_session")
 
@@ -193,12 +191,12 @@ class ClusterCustomer:
         # dataset.select("features").show(truncate=False)
         return dataset
 
-    def k_means(self, trainData, testData):
+    def k_means(self, trainData, testData, k=4):
         v_trainData = self.vectorize(trainData)
         v_testData = self.vectorize(testData)
 
         self.log.info("Trains a k-means model.")
-        kmeans = KMeans().setK(4).setSeed(123)
+        kmeans = KMeans().setK(k).setSeed(123)
         model = kmeans.fit(v_trainData)
 
         self.log.info("Make predictions")
@@ -207,24 +205,42 @@ class ClusterCustomer:
         # Evaluate clustering by computing Silhouette score
         evaluator = ClusteringEvaluator()
         silhouette = evaluator.evaluate(predictions)
-        self.log.info(f"Silhouette with squared euclidean distance = {str(silhouette)}\n")
+        self.log.debug(f"Silhouette with squared euclidean distance = {str(silhouette)}\n")
 
-        # Evaluate clustering.
-        # cost = model.computeCost(dataset)
-        # self.log.info("Within Set Sum of Squared Errors = " + str(cost))
+        self.log.debug("Evaluate clustering.")
+        cost = model.summary.trainingCost
+        self.log.debug("Within Set Sum of Squared Errors = " + str(cost))
 
         # Shows the result.
-        self.log.info("Cluster Centers: ")
+        self.log.debug("Cluster Centers: ")
         ctr = []
         centers = model.clusterCenters()
         for center in centers:
             ctr.append(center)
-            print(center)
+            # print(center)
+        self.log.debug(ctr)
 
         self.log.info("Save Model")
-        model.write().overwrite().save("kmeans-model")
+        model.write().overwrite().save("src/data/models/kmeans")
 
-        return model, silhouette, centers, predictions
+        return model, silhouette, centers, predictions, cost
+
+    def evaluate(self, trainData, testData):
+        cost = np.zeros(10)
+        for k in range(2, 10):
+            results = self.k_means(trainData, testData, k)
+            cost[k] = results[4]
+
+        # Plot the cost
+        df_cost = pd.DataFrame(cost[2:])
+        df_cost.columns = ["cost"]
+        new_col = [2, 3, 4, 5, 6, 7, 8, 9]
+        df_cost.insert(0, 'cluster', new_col)
+
+        fig = px.line(df_cost.cluster, df_cost.cost, title="Elbow Curve")
+        fig.show()
+        return df_cost
+
 
     def gaussian_mixture(self, trainData, testData):
         pass
@@ -235,3 +251,7 @@ class ClusterCustomer:
 
 if __name__ == "__main__":
     customer = ClusterCustomer()
+    train, test, dev = customer.prep_data(True)
+    result = customer.evaluate(train, test)
+    # print(result)
+    pass

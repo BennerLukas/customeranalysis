@@ -1,8 +1,10 @@
 # Ignored Folder - Custom
-data
+data/log
+data/models
 .vscode
 .idea
 2019*.csv
+*_new.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -134,3 +136,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 /doc/archive.zip
+/src/data/models/
