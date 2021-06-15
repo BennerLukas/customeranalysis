@@ -206,7 +206,7 @@ class ClusterCustomer:
 
         self.log.info("Make predictions")
         model.setPredictionCol("newPrediction")
-        predictions = model.predict(v_testData)
+        predictions = model.transform(v_testData)
 
         # Evaluate clustering by computing Silhouette score
         evaluator = ClusteringEvaluator()
