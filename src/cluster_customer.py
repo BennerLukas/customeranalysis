@@ -9,7 +9,7 @@ import numpy as np
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
 from pyspark.ml.clustering import GaussianMixture
-from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.feature import VectorAssembler, StandardScaler
 
 
 class DataPreparation:
@@ -19,12 +19,12 @@ class DataPreparation:
         self.spark, self.sc = self.create_spark_session()
 
     def set_logger(self, name, mode=logging.INFO):
-        log_format = ('[DataExploration][%(asctime)s] [%(levelname)-8s][%(name)-12s] %(message)s')
+        log_format = '[DataExplo][%(asctime)s][%(threadName)-12.12s][%(levelname)-8s][%(name)-12s] %(message)s'
 
         logging.basicConfig(
             level=mode,
             format=log_format,
-            filename=('src/data/log/debug.log'),
+            filename='src/data/log/debug.log',
         )
 
         logging.debug('debug')
@@ -34,7 +34,7 @@ class DataPreparation:
         logging.critical('critical')
 
         logger = logging.getLogger(name)
-        logFormatter = logging.Formatter("%(asctime)s [%(levelname)-8s] [%(name)-12s]  %(message)s")
+        logFormatter = logging.Formatter(log_format)
 
         consoleHandler = logging.StreamHandler()
         consoleHandler.setFormatter(logFormatter)
@@ -174,9 +174,13 @@ class ClusterCustomer:
             sdf_customer_profile = self.data.make_customer_profiles(sdf_session_agg)
         else:
             self.log.info("Read customer profile from CSV")
-            sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,
-                                                            inferSchema=True)
+            sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,inferSchema=True)
             sdf_customer_profile.printSchema()
+
+        # Scale
+
+        vectorized_data = self.vectorize(sdf_customer_profile)
+        standardized = self.scale(vectorized_data)
 
         (trainingData, testData, devData) = sdf_customer_profile.where(
             sdf_customer_profile["avg_turnover_per_session"] > 0).randomSplit([0.6, 0.3, 0.01], seed=123)
@@ -196,6 +200,9 @@ class ClusterCustomer:
         # dataset.select("features").show(truncate=False)
         return dataset
 
+    def scale(self, v_data):
+        pass
+
     def k_means(self, trainData, testData, k=4):
         v_trainData = self.vectorize(trainData)
         v_testData = self.vectorize(testData)
@@ -205,7 +212,6 @@ class ClusterCustomer:
         model = kmeans.fit(v_trainData)
 
         self.log.info("Make predictions")
-        model.setPredictionCol("newPrediction")
         predictions = model.transform(v_testData)
 
         # Evaluate clustering by computing Silhouette score
@@ -245,8 +251,7 @@ class ClusterCustomer:
         new_col = [2, 3, 4, 5, 6, 7, 8, 9]
         df_cost.insert(0, 'k', new_col)
 
-        fig = px.line(df_cost.k, df_cost.cost, title="Elbow Curve", labels={"k": "Number of K",
-                                                                            "cost": "Cost"})
+        fig = px.line(df_cost, x="k", y="cost", title="Elbow Curve")
 
         fig.show()
         return df_cost
