@@ -1,6 +1,5 @@
 # Customer Analysis
 
-Target of this project is to analyse customer behavior in online shops / e-commerce.
 
 [![GitHub issues](https://img.shields.io/github/issues/BennerLukas/customeranalysis)](https://github.com/BennerLukas/customeranalysis/issues)
 [![GitHub forks](https://img.shields.io/github/forks/BennerLukas/customeranalysis)](https://github.com/BennerLukas/customeranalysis/network)
@@ -16,7 +15,7 @@ Target of this project is to analyse customer behavior in online shops / e-comme
 ## Dataset
 The dataset is from [kaggle.com](kaggle.com) and can be found [here](https://www.kaggle.com/mkechinov/ecommerce-behavior-data-from-multi-category-store).
 
-It contains of user data from the months October and November 2019.
+It contains user data from the months october and november 2019.
 
 ## Usage
 For data storage a Postgresql Database can be used which is first initialised under docker with:
@@ -32,6 +31,11 @@ docker container run -p 5433:5432 --name data_exploration -e POSTGRES_PASSWORD=1
 - [Phillip Lange](https://github.com/Sabokou)
 - [Alina Buss](https://github.com/Alinabuss)
 
-### Target
+### Project Target
+Target of this project is to analyse customer behavior in online shops / e-commerce.
 
 ### Tools
+
+#### Spark
+
+#### Plotly
