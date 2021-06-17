@@ -29,8 +29,9 @@ class ClusterCustomer:
             sdf_customer_profile = self.data.make_customer_profiles(sdf_session_agg)
         else:
             self.log.info("Read customer profile from CSV")
-            sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,inferSchema=True)
-            sdf_customer_profile.printSchema()
+            sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,
+                                                            inferSchema=True)
+            # sdf_customer_profile.printSchema()
 
         sdf_customer_profile = sdf_customer_profile.where(sdf_customer_profile["avg_turnover_per_session"] > 0)
         vectorized_data = self.vectorize(sdf_customer_profile)
@@ -62,7 +63,7 @@ class ClusterCustomer:
         # scaled_data_ouptut.select("features", "scaled_features").show(truncate=False)
         return scaled_data_ouptut
 
-    def k_means(self, trainData, testData, k=4):
+    def k_means(self, trainData, testData, k=2):
         # v_trainData = self.vectorize(trainData)
         # v_testData = self.vectorize(testData)
 
@@ -94,7 +95,7 @@ class ClusterCustomer:
         # self.log.info("Save Model")
         # model.write().overwrite().save("src/data/models/kmeans")
 
-        # self.visualize(model, predictions)
+        self.visualize(model, predictions)
 
         return model, silhouette, centers, predictions, cost
 
@@ -115,21 +116,43 @@ class ClusterCustomer:
         fig.show()
         return df_cost
 
-    def gaussian_mixture(self, trainData, testData):
-        pass
-
     def visualize(self, model, predictions):
+        self.log.info("Visualize result")
         predictions.show()
 
-        centers = pd.DataFrame(model.clusterCenters(), columns=self.features)
-        print(centers.head())
+        predictions = predictions.withColumn("predicted_group",
+                                             predictions["prediction"].cast(pyspark.sql.types.StringType()))
 
-        fig = px.scatter(centers, x="avg_events_per_session", y="avg_turnover_per_session")
-        predictions = predictions.withColumn("predicted_group", predictions["prediction"].cast(pyspark.sql.types.StringType()))
+        # fig2 = px.scatter(predictions.toPandas(), x="avg_events_per_session", y="avg_turnover_per_session",
+        #                   color="predicted_group", hover_data=["user_id", "sum_turnover", "count_session"],
+        #                   title="K-Means: Visualize Clustering in 2D")
+        # fig2.show()
 
-        fig2 = px.scatter(predictions.toPandas(), x="avg_events_per_session", y="avg_turnover_per_session", color="predicted_group", hover_data=["user_id", "sum_turnover", "count_session"], title="K-Means: Visualize Clustering in 2D")
+        fig = go.Figure()
+        avg_per_feature = predictions.groupBy("prediction").agg(f.avg("avg_turnover_per_session").alias("avg_turnover_per_session"),
+                                                                f.avg("avg_events_per_session").alias("avg_events_per_session"),
+                                                                f.avg("sum_turnover").alias("sum_turnover"),
+                                                                f.avg("count_session").alias("count_session"),
+                                                                f.stddev("avg_turnover_per_session").alias("dev_avg_turnover_per_session"),
+                                                                f.stddev("avg_events_per_session").alias("dev_avg_events_per_session"),
+                                                                f.stddev("sum_turnover").alias("dev_sum_turnover"),
+                                                                f.stddev("count_session").alias("dev_count_session")
+                                                                )
 
-        fig2.show()
+        avg_per_feature.show()
+
+        df_avg_per_feature = avg_per_feature.toPandas()
+
+        for feature in self.features:
+            fig.add_trace(go.Bar(
+                x=df_avg_per_feature.prediction,
+                y=df_avg_per_feature[feature],
+                error_y=dict(type='data', array=df_avg_per_feature[f"dev_{feature}"]),
+                name=feature,
+            ))
+
+        fig.update_layout(barmode='group')
+        fig.update_xaxes(type='category')
         fig.show()
 
 
