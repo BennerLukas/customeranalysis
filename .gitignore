@@ -4,7 +4,7 @@ data/models
 .vscode
 .idea
 2019*.csv
-*_new.csv
+*_old*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
