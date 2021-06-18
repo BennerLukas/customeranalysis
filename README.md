@@ -32,6 +32,10 @@ docker container run -p 5433:5432 --name data_exploration -e POSTGRES_PASSWORD=1
 - [Phillip Lange](https://github.com/Sabokou)
 - [Alina Buss](https://github.com/Alinabuss)
 
-### Target
+### Project Goal
 
 ### Tools
+
+## Further documentation
+
+see [documentation.md](documentation.md)

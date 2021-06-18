@@ -76,6 +76,11 @@ class DataPreparation:
         # None Handling
         # sdf = sdf.fillna(value="not defined")
 
+        # drop extreme outlier around 15th of november -> only works for year 2019
+        sdf = sdf.where(sdf["dayofyear"] != 319)
+        sdf = sdf.where(sdf["dayofyear"] != 320)
+        sdf = sdf.where(sdf["dayofyear"] != 321)
+
         sdf.printSchema()
         return sdf
 
@@ -105,6 +110,7 @@ class DataPreparation:
                                                      f.when(sdf_session_agg["sum(purchases)"] > 0, 1).otherwise(0))
 
         sdf_session_agg.printSchema()
+        sdf_session_agg.show()
         return sdf_session_agg
 
     def make_customer_profiles(self, sdf_session_agg):

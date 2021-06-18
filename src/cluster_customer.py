@@ -6,8 +6,9 @@ import plotly.graph_objects as go
 import numpy as np
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
-from pyspark.ml.feature import VectorAssembler, StandardScaler
+from pyspark.ml.feature import VectorAssembler, StandardScaler, MinMaxScaler, MaxAbsScaler
 from pyspark.ml.feature import MinMaxScaler
+from pyspark.ml.functions import vector_to_array
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from pyspark.sql.functions import udf
@@ -35,7 +36,7 @@ class ClusterCustomer:
             self.data.export_to_csv(sdf_customer_profile, "data/customer_profile.csv")
         else:
             self.log.info("Read customer profile from CSV")
-            sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,
+            sdf_customer_profile = self.data.spark.read.csv("data/customer_profile_new.csv", header=True,
                                                             inferSchema=True)
             # sdf_customer_profile.printSchema()
 
@@ -62,27 +63,15 @@ class ClusterCustomer:
 
     def scale(self, v_data):
         self.log.info("Start scaling")
-        scaler = StandardScaler(inputCol="features", outputCol="scaled_features")
+        scaler = MaxAbsScaler(inputCol="features", outputCol="scaled_features")
         scaled_data = scaler.fit(v_data)
         scaled_data_ouptut = scaled_data.transform(v_data)
 
         # scaled_data_ouptut.select("features", "scaled_features").show(truncate=False)
         return scaled_data_ouptut
 
-    def scale_sdf(self, df):
-        df = self.spark.createDataFrame(self.sc.parallelize([['a', [1, 2, 3], [1, 2, 3]], ['b', [2, 3, 4], [2, 3, 4]]]),
-                                   ["id", "var1", "var2"])
 
-        columns = df.drop('id').columns
-        df_sizes = df.select(*[f.size(col).alias(col) for col in columns])
-        df_max = df_sizes.agg(*[f.max(col).alias(col) for col in columns])
-        max_dict = df_max.collect()[0].asDict()
-
-        df_result = df.select('id', *[df[col][i] for col in columns for i in range(max_dict[col])])
-        df_result.show()
-        return df
-
-    def k_means(self, trainData, testData, k=2):
+    def k_means(self, trainData, testData, k=10):
         # v_trainData = self.vectorize(trainData)
         # v_testData = self.vectorize(testData)
 
@@ -141,22 +130,25 @@ class ClusterCustomer:
         predictions = predictions.withColumn("predicted_group",
                                              predictions["prediction"].cast(pyspark.sql.types.StringType()))
 
-        # fig2 = px.scatter(predictions.toPandas(), x="avg_events_per_session", y="avg_turnover_per_session",
-        #                   color="predicted_group", hover_data=["user_id", "sum_turnover", "count_session"],
-        #                   title="K-Means: Visualize Clustering in 2D")
-        # fig2.show()
+        fig2 = px.scatter(predictions.toPandas(), x="avg_events_per_session", y="avg_turnover_per_session",
+                          color="predicted_group", hover_data=["user_id", "sum_turnover", "count_session"],
+                          title="K-Means: Visualize Clustering in 2D")
+        fig2.show()
+        n = len(self.features)
+        scaled_array = predictions.select("prediction", vector_to_array("scaled_features"))
+        result = scaled_array.select("prediction", *[scaled_array["UDF(scaled_features)"][i] for i in range(n)])
+        result.show()
 
-        predictions_scaled = predictions.withColumn("avg_turnover_per_session", predictions["avg_turnover_per_session"])
-
-        avg_per_feature = predictions.groupBy("prediction").agg(f.avg("avg_turnover_per_session").alias("avg_turnover_per_session"),
-                                                                f.avg("avg_events_per_session").alias("avg_events_per_session"),
-                                                                f.avg("sum_turnover").alias("sum_turnover"),
-                                                                f.avg("count_session").alias("count_session"),
-                                                                f.stddev("avg_turnover_per_session").alias("dev_avg_turnover_per_session"),
-                                                                f.stddev("avg_events_per_session").alias("dev_avg_events_per_session"),
-                                                                f.stddev("sum_turnover").alias("dev_sum_turnover"),
-                                                                f.stddev("count_session").alias("dev_count_session")
-                                                                )
+        avg_per_feature = result.groupBy("prediction").agg(
+            f.avg("UDF(scaled_features)[0]").alias("avg_turnover_per_session"),
+            f.avg("UDF(scaled_features)[1]").alias("avg_events_per_session"),
+            f.avg("UDF(scaled_features)[2]").alias("sum_turnover"),
+            f.avg("UDF(scaled_features)[3]").alias("count_session"),
+            f.stddev("UDF(scaled_features)[0]").alias("dev_avg_turnover_per_session"),
+            f.stddev("UDF(scaled_features)[1]").alias("dev_avg_events_per_session"),
+            f.stddev("UDF(scaled_features)[2]").alias("dev_sum_turnover"),
+            f.stddev("UDF(scaled_features)[3]").alias("dev_count_session")
+            )
 
         avg_per_feature.show()
 
@@ -171,14 +163,14 @@ class ClusterCustomer:
                 name=feature,
             ))
 
-        fig.update_layout(barmode='group')
+        fig.update_layout(barmode='group', title="Scaled Feature per Group", legend_title="Feature")
         fig.update_xaxes(type='category')
         fig.show()
 
 
 if __name__ == "__main__":
     customer = ClusterCustomer()
-    train, test, dev = customer.prep_data(False)
+    train, test, dev = customer.prep_data(True)
     # result = customer.evaluate(train, test)
     result = customer.k_means(train, test)
     # print(result)
