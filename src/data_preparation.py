@@ -81,6 +81,8 @@ class DataPreparation:
         sdf = sdf.where(sdf["dayofyear"] != 320)
         sdf = sdf.where(sdf["dayofyear"] != 321)
 
+        sdf = sdf.withColumn("event_time", sdf["event_time"].cast(pyspark.sql.types.TimestampType()))
+
         sdf.printSchema()
         return sdf
 
