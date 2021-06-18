@@ -7,6 +7,11 @@ import numpy as np
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
 from pyspark.ml.feature import VectorAssembler, StandardScaler
+from pyspark.ml.feature import MinMaxScaler
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml import Pipeline
+from pyspark.sql.functions import udf
+from pyspark.sql.types import DoubleType
 
 from data_preparation import DataPreparation
 
@@ -27,6 +32,7 @@ class ClusterCustomer:
             sdf = self.data.add_feature_engineering(sdf)
             sdf_session_agg = self.data.make_session_profiles(sdf)
             sdf_customer_profile = self.data.make_customer_profiles(sdf_session_agg)
+            self.data.export_to_csv(sdf_customer_profile, "data/customer_profile.csv")
         else:
             self.log.info("Read customer profile from CSV")
             sdf_customer_profile = self.data.spark.read.csv("src/data/customer_profile_new.csv", header=True,
@@ -62,6 +68,19 @@ class ClusterCustomer:
 
         # scaled_data_ouptut.select("features", "scaled_features").show(truncate=False)
         return scaled_data_ouptut
+
+    def scale_sdf(self, df):
+        df = self.spark.createDataFrame(self.sc.parallelize([['a', [1, 2, 3], [1, 2, 3]], ['b', [2, 3, 4], [2, 3, 4]]]),
+                                   ["id", "var1", "var2"])
+
+        columns = df.drop('id').columns
+        df_sizes = df.select(*[f.size(col).alias(col) for col in columns])
+        df_max = df_sizes.agg(*[f.max(col).alias(col) for col in columns])
+        max_dict = df_max.collect()[0].asDict()
+
+        df_result = df.select('id', *[df[col][i] for col in columns for i in range(max_dict[col])])
+        df_result.show()
+        return df
 
     def k_means(self, trainData, testData, k=2):
         # v_trainData = self.vectorize(trainData)
@@ -119,7 +138,6 @@ class ClusterCustomer:
     def visualize(self, model, predictions):
         self.log.info("Visualize result")
         predictions.show()
-
         predictions = predictions.withColumn("predicted_group",
                                              predictions["prediction"].cast(pyspark.sql.types.StringType()))
 
@@ -128,7 +146,8 @@ class ClusterCustomer:
         #                   title="K-Means: Visualize Clustering in 2D")
         # fig2.show()
 
-        fig = go.Figure()
+        predictions_scaled = predictions.withColumn("avg_turnover_per_session", predictions["avg_turnover_per_session"])
+
         avg_per_feature = predictions.groupBy("prediction").agg(f.avg("avg_turnover_per_session").alias("avg_turnover_per_session"),
                                                                 f.avg("avg_events_per_session").alias("avg_events_per_session"),
                                                                 f.avg("sum_turnover").alias("sum_turnover"),
@@ -143,6 +162,7 @@ class ClusterCustomer:
 
         df_avg_per_feature = avg_per_feature.toPandas()
 
+        fig = go.Figure()
         for feature in self.features:
             fig.add_trace(go.Bar(
                 x=df_avg_per_feature.prediction,
@@ -158,7 +178,7 @@ class ClusterCustomer:
 
 if __name__ == "__main__":
     customer = ClusterCustomer()
-    train, test, dev = customer.prep_data(True)
+    train, test, dev = customer.prep_data(False)
     # result = customer.evaluate(train, test)
     result = customer.k_means(train, test)
     # print(result)

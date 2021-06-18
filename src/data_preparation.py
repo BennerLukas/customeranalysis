@@ -16,7 +16,7 @@ class DataPreparation:
         logging.basicConfig(
             level=mode,
             format=log_format,
-            filename='src/data/log/debug.log',
+            filename='data/log/debug.log',
         )
 
         logging.debug('debug')
@@ -95,27 +95,28 @@ class DataPreparation:
                                                                              f.collect_list("bought_product"))
 
         sdf_session_agg = sdf_session_agg.withColumn("duration", (
-                sdf_session_agg["max(event_time)"] - sdf_session_agg["min(event_time)"]))
+                sdf_session_agg["max(event_time)"].cast("long") - sdf_session_agg["min(event_time)"].cast("long")))
         sdf_session_agg = sdf_session_agg.withColumn("sum(events)", (
                 sdf_session_agg["sum(views)"] + sdf_session_agg["sum(purchases)"] + sdf_session_agg["sum(carts)"]))
         sdf_session_agg = sdf_session_agg.withColumn("turnover", f.when(sdf_session_agg["sum(purchases)"] > 0, (
                 sdf_session_agg["sum(purchases)"] * sdf_session_agg["avg(price)"])).otherwise(0))
         sdf_session_agg = sdf_session_agg.withColumn("avg(price)", f.round(sdf_session_agg["avg(price)"], 2))
-        sdf_session_agg = sdf_session_agg.withColumn("successfull",
+        sdf_session_agg = sdf_session_agg.withColumn("successfully",
                                                      f.when(sdf_session_agg["sum(purchases)"] > 0, 1).otherwise(0))
 
         sdf_session_agg.printSchema()
-        return sdf
+        return sdf_session_agg
 
     def make_customer_profiles(self, sdf_session_agg):
         self.log.info("Create Customer Profiles")
+        sdf_session_agg.show()
         sdf_customer_profile = sdf_session_agg.groupBy("user_id").agg(f.sum("sum(events)").alias("sum_events"),
                                                                       f.sum("sum(views)").alias("sum_views"),
                                                                       f.sum("sum(purchases)").alias("sum_purchases"),
                                                                       f.sum("sum(carts)").alias("sum_carts"),
                                                                       f.sum("turnover").alias("sum_turnover"),
                                                                       f.count("user_session").alias("count_session"),
-                                                                      f.sum("successfull").alias("sum_successfull"),
+                                                                      f.sum("successfully").alias("sum_successfully"),
                                                                       f.collect_list(
                                                                           "collect_list(bought_product)").alias(
                                                                           "bought_product"),
@@ -146,3 +147,13 @@ class DataPreparation:
 
         sdf = sdf_201910.union(sdf_201911)
         return sdf
+
+
+if __name__ == "__main__":
+    data_prep = DataPreparation()
+    data_prep.log.info("Create customer profile vom scratch")
+    sdf = data_prep.read_standard_data()
+    sdf = data_prep.add_feature_engineering(sdf)
+    sdf_session_agg = data_prep.make_session_profiles(sdf)
+    sdf_customer_profile = data_prep.make_customer_profiles(sdf_session_agg)
+    data_prep.export_to_csv(sdf_customer_profile)
