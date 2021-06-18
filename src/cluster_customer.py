@@ -6,13 +6,9 @@ import plotly.graph_objects as go
 import numpy as np
 from pyspark.ml.evaluation import ClusteringEvaluator
 from pyspark.ml.clustering import KMeans
-from pyspark.ml.feature import VectorAssembler, StandardScaler, MinMaxScaler, MaxAbsScaler
-from pyspark.ml.feature import MinMaxScaler
+from pyspark.ml.feature import VectorAssembler, MaxAbsScaler
 from pyspark.ml.functions import vector_to_array
-from pyspark.ml.feature import VectorAssembler
-from pyspark.ml import Pipeline
-from pyspark.sql.functions import udf
-from pyspark.sql.types import DoubleType
+
 
 from data_preparation import DataPreparation
 
@@ -23,8 +19,8 @@ class ClusterCustomer:
         self.data = DataPreparation()
         self.log = self.data.set_logger("K-Means")
         self.log.info("Finished Init")
-        self.features = ("avg_turnover_per_session", "avg_events_per_session", "sum_turnover", "count_session")
-        # features = ("sum_views", "sum_turnover", "sum_purchases", "sum_carts", "count_session")
+        self.features = ("avg_turnover_per_session", "avg_events_per_session", "sum_turnover", "count_session",
+                         "sum_views", "sum_purchases", "sum_carts", "avg(duration)")
 
     def prep_data(self, read_existing=True):
         if read_existing is False:
@@ -144,10 +140,18 @@ class ClusterCustomer:
             f.avg("UDF(scaled_features)[1]").alias("avg_events_per_session"),
             f.avg("UDF(scaled_features)[2]").alias("sum_turnover"),
             f.avg("UDF(scaled_features)[3]").alias("count_session"),
+            f.avg("UDF(scaled_features)[4]").alias("sum_views"),
+            f.avg("UDF(scaled_features)[5]").alias("sum_purchases"),
+            f.avg("UDF(scaled_features)[6]").alias("sum_carts"),
+            f.avg("UDF(scaled_features)[7]").alias("avg(duration)"),
             f.stddev("UDF(scaled_features)[0]").alias("dev_avg_turnover_per_session"),
             f.stddev("UDF(scaled_features)[1]").alias("dev_avg_events_per_session"),
             f.stddev("UDF(scaled_features)[2]").alias("dev_sum_turnover"),
-            f.stddev("UDF(scaled_features)[3]").alias("dev_count_session")
+            f.stddev("UDF(scaled_features)[3]").alias("dev_count_session"),
+            f.stddev("UDF(scaled_features)[4]").alias("dev_sum_views"),
+            f.stddev("UDF(scaled_features)[5]").alias("dev_sum_purchases"),
+            f.stddev("UDF(scaled_features)[6]").alias("dev_sum_carts"),
+            f.stddev("UDF(scaled_features)[7]").alias("dev_avg(duration)")
             )
 
         avg_per_feature.show()
