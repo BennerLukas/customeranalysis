@@ -149,11 +149,14 @@ class DataPreparation:
         sdf_export.coalesce(1).write.format("csv").mode("overwrite").save(path, header="true")
         return True
 
-    def read_standard_data(self):
-        sdf_201911 = self.spark.read.csv("data/2019-Nov.csv", header=True, inferSchema=True)
-        sdf_201910 = self.spark.read.csv("data/2019-Oct.csv", header=True, inferSchema=True)
+    def read_standard_data(self, small_dataset=False):
+        if not small_dataset:
+            sdf_201911 = self.spark.read.csv("data/2019-Nov.csv", header=True, inferSchema=True)
+            sdf_201910 = self.spark.read.csv("data/2019-Oct.csv", header=True, inferSchema=True)
 
-        sdf = sdf_201910.union(sdf_201911)
+            sdf = sdf_201910.union(sdf_201911)
+        else:
+            sdf = self.spark.read.csv("data/2019-Nov.csv", header=True, inferSchema=True)
         return sdf
 
 
