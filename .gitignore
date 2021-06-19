@@ -1,6 +1,8 @@
 # Ignored Folder - Custom
+.vscode
 .idea
 2019*.csv
+src/data/models
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
