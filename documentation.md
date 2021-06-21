@@ -40,7 +40,7 @@ Den Seed und die Distanzberechnungsart (Euklid) haben wir konstant gelassen.
 Weiterer wichtiger Punkt ist die Auswahl der Features, mit denen das Modell lernen soll. Daher haben wir das Modell mit verschiedenen Kombinationen der Features trainiert.
 
 Für die Ermittlung von k haben wir eine Elbow-Curve aufgestellt, mit der visuell das beste k herausgefunden werden kann
-<img src="/src/data/exports/elbow-curve_kmeans.png" alt="elbow" width="180" align="center"/>
+<img src="/src/data/exports/elbow-curve_kmeans.png" alt="elbow" width="500" align="center"/>
 
  ### Abschließende Interpretationen 
 -> DBSCAN?
