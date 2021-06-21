@@ -49,12 +49,19 @@ Eine Visualisierung der Cluster wie im Folgenden ist nicht sehr geeignet, da nur
 
 <img src="https://github.com/BennerLukas/customeranalysis/blob/main/src/data/exports/k-means_2D.png" alt="k=4" width="800" align="center"/>
 
-Bei k=10 wird dies noch unübersichtlicher
+Bei k=10 wird dies noch unübersichtlicher:
 
 <img src="https://github.com/BennerLukas/customeranalysis/blob/main/src/data/exports/k-means_2D_k10.png" alt="k=10" width="800" align="center"/>
 
+Da man aber ja nicht jeden einzelnen Punkt herausfinden will, sondern es eher interessant ist welche Werte für welche Features man benötigt, um in eine bestimmte Gruppe zu fallen haben wir
+folgenden Plot entwickelt.
+Dieser stellt den Durchschnittlichen (skalierten) Wert des Features innerhalb dieser einen Gruppe (Cluster) dar (inklusive Standardabweichung).
+<div w3-include-html="src/data/exports/k-means_feature_dist_k10_proper_scaled.html"></div>
+
  ### Abschließende Interpretationen 
 -> DBSCAN?
+-> more features -> better testing
+-> identifizeren von custom marketing für bestimmte Gruppen
 
 # Weitere Schritte 
 (Alina)
