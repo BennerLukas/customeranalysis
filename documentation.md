@@ -57,7 +57,7 @@ Da man aber ja nicht jeden einzelnen Punkt herausfinden will, sondern es eher in
 folgenden Plot entwickelt.
 Dieser stellt den Durchschnittlichen (skalierten) Wert des Features innerhalb dieser einen Gruppe (Cluster) dar (inklusive Standardabweichung).
 
-<iframe src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k10_proper_scaled.html"></iframe>
+ <iframe src="https://www.w3schools.com" title="W3Schools Free Online Web Tutorials"></iframe> 
 
  ### Abschließende Interpretationen 
 -> DBSCAN?
