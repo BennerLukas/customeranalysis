@@ -18,15 +18,14 @@ The dataset is from [kaggle.com](kaggle.com) and can be found [here](https://www
 It contains user data from the months october and november 2019.
 
 ## Usage
-For data storage a Postgresql Database can be used which is first initialised under docker with:
-```bash
-docker container run -p 5433:5432 --name data_exploration -e POSTGRES_PASSWORD=1234 postgres:13.2
-```
-
+1. Download the data from [here](https://www.kaggle.com/mkechinov/ecommerce-behavior-data-from-multi-category-store).
+2. Put the data in ```/src/data``` and unzip it to csv.
+3. make sure you have installed all modules from ```requirements.txt```.
+4. Run the ```explore.ipynb``` for initial analysis (Attention the whole dataset is giant. For debugging use ```src/data/test_data.csv```)
 ## About the project
 
 ### Team
-
+Our Team:
 - [Lukas Benner](https://github.com/BennerLukas)
 - [Phillip Lange](https://github.com/Sabokou)
 - [Alina Buss](https://github.com/Alinabuss)
@@ -37,5 +36,16 @@ Target of this project is to analyse customer behavior in online shops / e-comme
 ### Tools
 
 #### Spark
+Spark and Pyspark as the Python module is used as the "analytics engine" and modelling tool.
+
+More about Spark see [here](https://spark.apache.org/).
 
 #### Plotly
+For easy and interactive plotting the library plotly was used.
+
+The figures are saved in ```src/data/exports```.
+More about Plotly see [here](https://plotly.com/).
+
+## Documentation
+
+Our more explicit documentation (in German) can be found [here](https://github.com/BennerLukas/customeranalysis/blob/main/documentation.md)
