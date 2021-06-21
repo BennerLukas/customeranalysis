@@ -39,8 +39,19 @@ Den Seed und die Distanzberechnungsart (Euklid) haben wir konstant gelassen.
 
 Weiterer wichtiger Punkt ist die Auswahl der Features, mit denen das Modell lernen soll. Daher haben wir das Modell mit verschiedenen Kombinationen der Features trainiert.
 
-Für die Ermittlung von k haben wir eine Elbow-Curve aufgestellt, mit der visuell das beste k herausgefunden werden kann
-<img src="/src/data/exports/elbow-curve_kmeans.png" alt="elbow" width="500" align="center"/>
+Für die Ermittlung von k haben wir eine Elbow-Curve aufgestellt, mit der visuell das beste k herausgefunden werden kann.
+Aus dem Schaubild kann nun ein mögliches ideales k von 10 herausgelesen werden. 
+Im Zuge der Erklärbarkeit der Kundengruppen haben wir uns aber zusätzlich dazu entschieden auch einmal ein k=4 auszuprobieren. 
+<img src="/src/data/exports/elbow-curve_kmeans.png" alt="elbow" width="800" align="center"/>
+
+Nachdem das Modell mit k=4 trainiert wurde, fällt es schwer festzustellen, ob und wie gut das Modell ist. 
+Eine Visualisierung der Cluster wie im Folgenden ist nicht sehr geeignet, da nur 2 Features der ingesamt 8 Features dargestellt werden können:
+
+<img src="https://github.com/BennerLukas/customeranalysis/blob/main/src/data/exports/k-means_2D.png" alt="k=4" width="800" align="center"/>
+
+Bei k=10 wird dies noch unübersichtlicher
+
+<img src="https://github.com/BennerLukas/customeranalysis/blob/main/src/data/exports/k-means_2D_k10.png" alt="k=10" width="800" align="center"/>
 
  ### Abschließende Interpretationen 
 -> DBSCAN?
