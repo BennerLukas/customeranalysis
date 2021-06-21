@@ -56,7 +56,8 @@ Bei k=10 wird dies noch unübersichtlicher:
 Da man aber ja nicht jeden einzelnen Punkt herausfinden will, sondern es eher interessant ist welche Werte für welche Features man benötigt, um in eine bestimmte Gruppe zu fallen haben wir
 folgenden Plot entwickelt.
 Dieser stellt den Durchschnittlichen (skalierten) Wert des Features innerhalb dieser einen Gruppe (Cluster) dar (inklusive Standardabweichung).
-<div w3-include-html="src/data/exports/k-means_feature_dist_k10_proper_scaled.html"></div>
+
+<iframe src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k10_proper_scaled.html"></iframe>
 
  ### Abschließende Interpretationen 
 -> DBSCAN?
