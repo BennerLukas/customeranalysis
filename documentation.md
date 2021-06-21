@@ -27,7 +27,7 @@ Als erstens werden das Feature-Engineering angewendet. Anschlißend die Daten au
 Kunden angelegt (siehe ```src/data/data_preparation.py```).
 
 Die Kundenprofile wurden dann in eine eigene Datei ausgelagert. Dadurch kann die Laufzeit deutlich verringert werden.
-
+Für das Modelling werden nur Kunden verwendet, die insgesamt einen Umsatz von > 0 € getätigt haben.
  ### Training und Programm 
 Für die Ermittlung der verschiedenen Kundengruppen wird ein unsupervised Learning Algorithmus benötigt. Hier haben wir uns für k-means entschieden, da dies eine gute 
 Erklärbarkeit des Models gewährleistet. Da in diesem Projekt komplett auf Spark gesetzt wurde, wird auch das modelling mit Spark umgesetzt (siehe [K-Means](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.clustering.KMeans.html)).
@@ -56,17 +56,24 @@ Bei k=10 wird dies noch unübersichtlicher:
 Da man aber ja nicht jeden einzelnen Punkt herausfinden will, sondern es eher interessant ist welche Werte für welche Features man benötigt, um in eine bestimmte Gruppe zu fallen haben wir
 folgenden Plot entwickelt.
 Dieser stellt den Durchschnittlichen (skalierten) Wert des Features innerhalb dieser einen Gruppe (Cluster) dar (inklusive Standardabweichung).
-<img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k4.png
-" alt="k_dist=10" width="800" align="center"/>
 
 <img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k4.png" alt="k_dist=10" width="800" align="center"/>
 
 <img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k10.png" alt="k_dist=10" width="800" align="center"/>
 
+(für eine interaktive Betrachtung der Plots öffne in ```src/data/exports``` die gewünschte .html Datei)
+
  ### Abschließende Interpretationen 
--> DBSCAN?
--> more features -> better testing
--> identifizeren von custom marketing für bestimmte Gruppen
+Die ermittelten Kundengruppen sind für k=4 und auch für k=10 mit eindeutigen Eigenschaften trennbar. 
+Zum Beispiel werden Kunden die meist nur Produkte anschauen, aber so gut wie kaufen oder man findet Kunden, die sehr viel Umsatz im Verhältnis zu der Anzahl der Events getätigt haben (also spontane Käufer).
+Es gibt aber auch das Gegenteil, also Kunden die erst sehr viel herumklicken und dann kaufen.
+Mithilfe dieser identifizierten Kundengruppen soll (bzw. kann) nun Kundengruppen spezifisches Marketing betrieben werden.
+
+Die einfache Erklärbarkeit, warum ein bestimmter Kunde einer bestimmten Gruppe zugeordnet wird, ist sehr gut. Dadurch kann das Modell jederzeit auf plausibilität überprüft werden.
+
+Weitere Schritte um diese Data Exploration fortzuführen wären zum Beispiel:
+- ein weiteres Modell testen (z.B. DBSCAN)
+- mehr Features entwickeln und die Kombinationen miteinander testen (z.B. Anzahl Käufe je Produktkategorie)
 
 # Weitere Schritte 
 (Alina)
