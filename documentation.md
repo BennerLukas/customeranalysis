@@ -59,8 +59,9 @@ Dieser stellt den Durchschnittlichen (skalierten) Wert des Features innerhalb di
 <img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k4.png
 " alt="k_dist=10" width="800" align="center"/>
 
-<img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k4.png
-" alt="k_dist=10" width="800" align="center"/>
+<img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k4.png" alt="k_dist=10" width="800" align="center"/>
+
+<img src="https://raw.githubusercontent.com/BennerLukas/customeranalysis/main/src/data/exports/k-means_feature_dist_k10.png" alt="k_dist=10" width="800" align="center"/>
 
  ### Abschließende Interpretationen 
 -> DBSCAN?
