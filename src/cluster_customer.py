@@ -66,7 +66,6 @@ class ClusterCustomer:
         # scaled_data_ouptut.select("features", "scaled_features").show(truncate=False)
         return scaled_data_ouptut
 
-
     def k_means(self, trainData, testData, k=10):
         # v_trainData = self.vectorize(trainData)
         # v_testData = self.vectorize(testData)
@@ -178,4 +177,3 @@ if __name__ == "__main__":
     # result = customer.evaluate(train, test)
     result = customer.k_means(train, test)
     # print(result)
-    pass
