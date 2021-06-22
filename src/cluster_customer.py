@@ -66,7 +66,7 @@ class ClusterCustomer:
         # scaled_data_ouptut.select("features", "scaled_features").show(truncate=False)
         return scaled_data_ouptut
 
-    def k_means(self, trainData, testData, k=4):
+    def k_means(self, trainData, testData, k=10):
         # v_trainData = self.vectorize(trainData)
         # v_testData = self.vectorize(testData)
 
@@ -121,7 +121,7 @@ class ClusterCustomer:
 
     def visualize(self, model, predictions):
         self.log.info("Visualize result")
-        predictions.show()
+        # predictions.show()
         predictions = predictions.withColumn("predicted_group",
                                              predictions["prediction"].cast(pyspark.sql.types.StringType()))
 
@@ -132,7 +132,7 @@ class ClusterCustomer:
         n = len(self.features)
         scaled_array = predictions.select("prediction", vector_to_array("scaled_features"))
         result = scaled_array.select("prediction", *[scaled_array["UDF(scaled_features)"][i] for i in range(n)])
-        result.show()
+        # result.show()
 
         avg_per_feature = result.groupBy("prediction").agg(
             f.avg("UDF(scaled_features)[0]").alias("avg_turnover_per_session"),
@@ -153,7 +153,7 @@ class ClusterCustomer:
             f.stddev("UDF(scaled_features)[7]").alias("dev_avg(duration)")
             )
 
-        avg_per_feature.show()
+        # avg_per_feature.show()
 
         df_avg_per_feature = avg_per_feature.toPandas()
 
