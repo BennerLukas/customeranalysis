@@ -3,6 +3,7 @@
 .idea
 2019*.csv
 src/data/models
+customer_profile*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
