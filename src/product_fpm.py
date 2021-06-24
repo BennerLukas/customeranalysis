@@ -16,17 +16,9 @@ class FrequencyPatternMining:
         self.log = self.data.set_logger("FPGrowth")
         self.log.info("Finished Init")
 
-    # def save_reopen_data(self, dataset, path="data/fpm.csv"):
-    #     dataset.coalesce(1).write.format("csv").mode("overwrite").save(path, header="true")
-    #     sdf = self.data.spark.read.csv(path, header=True, inferSchema=True)
-    #
-    #     self.log.debug("Reopened dataset")
-    #
-    #     return sdf
-
     def shape_data(self, dataset, group_by_column="user_id", filter_element=None, focus="product_id"):
         self.log.info("Aggregating dataset")
-
+        self.focus = focus
         if filter_element is None:
             self.aggregated_dataset = dataset.select(group_by_column, focus).distinct() \
                 .groupBy(group_by_column) \
@@ -67,7 +59,7 @@ class FrequencyPatternMining:
 
         if save:
             self.log.info("Saving Model")
-            model.write().overwrite().save(f"data/models/fpgrowth")
+            model.write().overwrite().save(f"data/models/fpgrowth_{self.focus}")
 
         return model
 
@@ -75,6 +67,6 @@ class FrequencyPatternMining:
 if __name__ == "__main__":
     fpm = FrequencyPatternMining()
     sdf = fpm.prep_data(small_dataset=True)
-    sdf = fpm.shape_data(sdf, filter_element="views")
-    model = fpm.train(sdf, min_support=0.001)
+    sdf = fpm.shape_data(sdf, filter_element="purchases", focus="category_sub_sub_class")
+    model = fpm.train(sdf, min_support=0.0001)
     pass
