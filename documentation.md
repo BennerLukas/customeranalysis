@@ -3,28 +3,54 @@
 
 
 # Einführung 
-Das Projekt "customeranalysis" wird von der Gruppe "eShopper" durchgeführt. Diese besteht aus den Studenten Alina Buss (4163246), Phillip Lange (...) und Lukas Benner (6550912). Hierbei soll das Kundenverhalten innerhalb eines eShops analysiert werden, sodass im Nachhinein Kundensegmente ermittelt und EMpfehlungen ausgesprochen werden können.
+Das Projekt "customeranalysis" wird von der Gruppe "eShopper" durchgeführt. 
+Diese besteht aus den Studenten Alina Buss (4163246), Phillip Lange (...) und Lukas Benner (6550912). 
+Hierbei soll das Kundenverhalten innerhalb eines eShops analysiert werden, sodass im Nachhinein Kundensegmente ermittelt und Empfehlungen ausgesprochen werden können.
 
 ## Datensatz
-Für das Projekt wird auf einen transaktionalen Datensatz von Kaggle zurückgegriffen. Dieser kann unter folgendem Link runtergeladen wurden: https://www.kaggle.com/mkechinov/ecommerce-behavior-data-from-multi-category-store. Dieser Datensatz umfasst jegliche Events des eShops in den Monaten Oktober und November 2019. Die Events wurden hierbei in die Kategorien "View", "Add to Cart" und "Purchase" unterteilt. Zusätzlich gibt es noch Informationen zu dem Event-Zeitpunkt, der Product-ID, der Category-ID, dem Category-Code, der Marke, dem Preis, der User-Id und der User-Session. Hierbei ergibt sich eine Gesamtgröße von ca. 14GB mit 100 Millionen Einträgen. Da die Analysen mit einem so großen Datensatz sehr langsam ausfallen, wurde zusätzlich ein repäsentatives sample mit nur 100.000 Einträgen erstellt.
+Für das Projekt wird auf einen transaktionalen Datensatz von Kaggle zurückgegriffen. Dieser kann unter folgendem Link heruntergeladen werden: https://www.kaggle.com/mkechinov/ecommerce-behavior-data-from-multi-category-store. 
+Dieser Datensatz umfasst jegliche Events des eShops in den Monaten Oktober und November 2019. Die Events wurden hierbei in die Kategorien "View", "Add to Cart" und "Purchase" unterteilt. Zusätzlich gibt es noch Informationen zu dem Event-Zeitpunkt, der Product-ID, der Category-ID, dem Category-Code, der Marke, dem Preis, der User-Id und der User-Session. 
+Hierbei ergibt sich eine Gesamtgröße von ca. 14GB mit 100 Millionen Einträgen. Da die Analysen mit einem so großen Datensatz sehr langsam ausfallen, wurde zusätzlich ein repräsentatives Sample mit nur 100.000 Einträgen erstellt.
 
 ## Tools
 Zur Analyse des Datensatzes wurden die Pakete "pyspark" und "pandas" genutzt. Zur Visualisierung der Daten wird zusätzlich das Paket "plotly" importiert.
 
 # Daten Exploration 
-Im Folgenden werden primär die ursprünglichen Spalten des Datensatzes einzeln analysiert. Daraufhin werden auf Basis der neuen Erkenntnissen neue Spalten innerhalb des Feature Enginneerings erstellt und ebenfalls untersucht. Daraufhin werden alle Spalten in Abhängigkeit voneinander untersucht, um mögliche Auffäligkeiten zu erkennen. Diese Auffälligkeiten sollen mithilfe von Korrelationsmatrizen im letzten Schritt validiert werden.
+Im Folgenden werden primär die ursprünglichen Spalten des Datensatzes einzeln analysiert. 
+Daraufhin werden auf Basis der neuen Erkenntnissen neue Spalten innerhalb des Feature Enginneerings erstellt und ebenfalls untersucht. 
+Daraufhin werden alle Spalten in Abhängigkeit voneinander untersucht, um mögliche Auffälligkeiten zu erkennen. 
+Diese Auffälligkeiten sollen mithilfe von Korrelationsmatrizen im letzten Schritt validiert werden.
+
 ## Gesonderte Spaltenanalyse
-Der ursprüngliche Datensatz besteht aus den Attributen "event_time", "product_id", "category_id", "category_code", "brand", "price", "user_id" and "user_session". Hierbei existieren ca. 200.000  Produkte, 4300 Marken, 5.000.000 User und 23.000.000 User-Sessions.
-Die Spalten "product_id", "category_id" und "user_id" sind simple IDs die auf das entsprechende Produkt, die Kategorie oder den User hindeuten. Die Spalte "user_session" ist ebenfalls eine ID, die die User_Session eindeutig identifiziert. Der "category_code" besteht meist aus 2 oder 3 Unterpunkten, die die Kateogrie eines Produktes beschreiben. Die beliebtesten category_codes sind hierbei die "electronics.smartphone" und "electronics.clocks". Das Attribut "price" ordnet einer Product_ID immer einen einzigarten Preis zu. Die Preise befinden sich hierbei zwischen 0 und 2574€, wobei der Mittlewert bei 292€ liegt. Das Attribut "brand" ordnet ebenfalls einem Produkt eine bestimmte Marke zu. Hierbei sind die Marken Samsung, Apple und Xiaomi besonders beliebt. Die Spalte "Event_time" besteht aus einem Datum und einem Zeitstempel. Der "event_type" identifiziert um welche Art von Interaktion es sich handelt. Hierbei wird unterschieden zwischen den Aktionen "View", "Cart" und "Purchase". Hierbei fällt auf, dass 94,9% der Aktionen Views sind, 3.6% Carts und 1.5% Purchases. Dies bedeutet, dass der Datensatz sehr ungleich verteilt ist. 
+Der ursprüngliche Datensatz besteht aus den Attributen "event_time", "product_id", "category_id", "category_code", "brand", "price", "user_id" and "user_session". 
+Hierbei existieren ca. 200.000  Produkte, 4300 Marken, 5.000.000 User und 23.000.000 User-Sessions.
+Die Spalten "product_id", "category_id" und "user_id" sind simple IDs die auf das entsprechende Produkt, die Kategorie oder den User hindeuten. 
+Die Spalte "user_session" ist ebenfalls eine ID, die die User_Session eindeutig identifiziert. 
+Der "category_code" besteht meist aus 2 oder 3 Unterpunkten, die die Kateogrie eines Produktes beschreiben. 
+Die beliebtesten category_codes sind hierbei die "electronics.smartphone" und "electronics.clocks". 
+Das Attribut "price" ordnet einer Product_ID immer einen eindeutigen Preis zu. 
+Die Preise befinden sich hierbei zwischen 0 und 2574€, wobei der Mittlewert bei 292€ liegt. 
+Das Attribut "brand" ordnet ebenfalls einem Produkt eine bestimmte Marke zu. Hierbei sind die Marken Samsung, Apple und Xiaomi besonders beliebt. 
+Die Spalte "Event_time" besteht aus einem Datum und einem Zeitstempel. Der "event_type" identifiziert um welche Art von Interaktion es sich handelt. 
+Hierbei wird unterschieden zwischen den Aktionen "View", "Cart" und "Purchase". Hierbei fällt auf, dass 94,9% der Aktionen Views sind, 3.6% Carts und 1.5% Purchases. 
+Dies bedeutet, dass der Datensatz sehr ungleich verteilt ist. 
+
 ## Feature Engineering 
-Primär wird die Spalte "category_code", die jeweils aus drei Aspekten besteht, in die Kategorien "category_class", "category_sub_class" und "category_sub_sub_class" aufgeteilt. Hierbei ergeben sich 13 Haupt-Kategorieklassen. Dabei fällt auf, dass die Klasse "electronics" mit über 50% der Interaktionen die beliebteste Klasse ist. Innerhalb dieser Klasse stechen wiederrum die Smartphones besonders heraus. 
-Daraufhin wird aus der Spalte "event_time", die neuen Attribute "year", "month", "weekofyear", "dayofyear", "dayofmonth", und "hour" extrahiert. Diese Attribute sind für folgende Detailanalysen nützlich.
-Außerdem konnte ermittelt werden, dass innerhalb einer User_Session eine Product_ID teilweise bis zu 47 Mal gekauft wurde. Daraus lässt sich folgern, dass für jedes Exemplar eines Produktes, das gekauft wird, eine neue Transaktion erstellt wird. Beruhend auf dieser Erkenntnis konnten zusätzlich die Spalten "Turnover", "bougth_quantity", "viewed_quantity" und "cart_quantity" erstellt werden, die für die folgenden Analysen nützlich sind. HIerbei ergibt sich das insgesamt ein Umsatz von ca 50M € generiert wurde. Diese 4 Attribute werden im Folgenden zu den Entscheidungsvariablen, um das Kundenverhalten zu beschreiben.
+Primär wird die Spalte "category_code", die jeweils aus drei Aspekten besteht, in die Kategorien "category_class", "category_sub_class" und "category_sub_sub_class" aufgeteilt. 
+Hierbei ergeben sich 13 Haupt-Kategorieklassen. Dabei fällt auf, dass die Klasse "electronics" mit über 50% der Interaktionen die beliebteste Klasse ist. 
+Innerhalb dieser Klasse stechen wiederum die Smartphones besonders heraus. 
+Daraufhin wird aus der Spalte "event_time", die neuen Attribute "year", "month", "weekofyear", "dayofyear", "dayofmonth", und "hour" extrahiert. 
+Diese Attribute sind für folgende Detailanalysen nützlich.
+Außerdem konnte ermittelt werden, dass innerhalb einer User_Session eine Product_ID teilweise bis zu 47 Mal gekauft wurde. 
+Daraus lässt sich folgern, dass für jedes Exemplar eines Produktes, das gekauft wird, eine neue Transaktion erstellt wird. 
+Beruhend auf dieser Erkenntnis konnten zusätzlich die Spalten "Turnover", "bougth_quantity", "viewed_quantity" und "cart_quantity" erstellt werden, die für die folgenden Analysen nützlich sind. 
+Hierbei ergibt sich das insgesamt ein Umsatz von ca 50M € generiert wurde. Diese 4 Attribute werden im Folgenden zu den Entscheidungsvariablen, um das Kundenverhalten zu beschreiben.
+
 ## Kombinierte Spaltenanalysen 
 ### Zeitpunkt-Analyse
 Primär wird die Abhängigkeit der Entscheidungsvariablen von dem Zeitpunkt analysiert.Hierbei fällt auf, dass die meisten Interaktionen in der Mitte des Monats (15.-17.) stattfinden. Dasselbe Verhalten ist auch am Umsatz erkennbar, der ebenfalls in der Mitte des Monats, besonders am 17., am größten ist. Hierbei ist der Umsatz am 17.November allerdings ungewöhnlich hoch, während für den 15.November gar kein Umsatz generiert wurde. Diese Ausreißer deuten auf einen Systemfehler zu dem entsprechenden Zeitpunkt hin. Nichtsdestotrotz ist eine deutliche Umsatzsteigerung in der Mitte des Monats ableitbar.
 Außerdem ist auch erkennbar, dass tendenziell mehr Aktivitäten am Wochende (Freitag bis Sonntag) stattfinden. Dies wird auch von dem Umsatz bestätigt, der am Sonntag am höchsten ist.
-In der Tagesverteilung zeigen sich die Nachmittags-Stunden (15-18Uhr) als besonders interaktionsreich aus, während die Morgen- und Mittagsstunden (6-14Uhr) ein konstant hohes Interaktionsvolumen erreichen. Der Umsatz hingegen hat seinen Peak in der Morgens- und Mittagszeit. Hierbei sticht besonder die Uhrzeit 10 Uhr raus. 
+In der Tagesverteilung zeigen sich die Nachmittags-Stunden (15-18Uhr) als besonders interaktionsreich aus, während die Morgen- und Mittagsstunden (6-14Uhr) ein konstant hohes Interaktionsvolumen erreichen. Der Umsatz hingegen hat seinen Peak in der Morgens- und Mittagszeit. Hierbei sticht besonders die Uhrzeit 10 Uhr raus. 
 
 ### Produktanalysen
 In der Produktanalyse fällt auf, dass ein Category_Class immer mehrer Category_codes umfasst. Diese umfassen wiederrum mehrere Category_IDs, welche mehrere Produkt_IDs umfassen. Daraus ergibt sich die folgende Beziehung: Product_ID ⊂ Category_ID ⊂ Category_Code ⊂ Category_Class. Die Marken hingegen sind Klassenübergreifend. 
@@ -51,15 +77,15 @@ Bei der Preis-Analyse ist erkennbar, dass ein hoher Preis auch zu einem hohen Um
 (Phillip)
 
 ## Kunden-Cluster mit K-Means 
-(Lukas)
- ### Datenvorbereitung
+
+### Datenvorbereitung
 Um die Kundenklassifizierung umzusetzen werden die Insights aus der Data Exploration verwendet.
-Als erstens werden das Feature-Engineering angewendet. Anschlißend die Daten auf Session-Ebene aggregiert. Mithilfe dieser Daten wird daraufhin ein Kundenprofil für jeden 
+Als erstens werden das Feature-Engineering angewendet. Anschließend die Daten auf Session-Ebene aggregiert. Mithilfe dieser Daten wird daraufhin ein Kundenprofil für jeden 
 Kunden angelegt (siehe ```src/data/data_preparation.py```).
 
 Die Kundenprofile wurden dann in eine eigene Datei ausgelagert. Dadurch kann die Laufzeit deutlich verringert werden.
 Für das Modelling werden nur Kunden verwendet, die insgesamt einen Umsatz von > 0 € getätigt haben.
- ### Training und Programm 
+### Training und Programm 
 Für die Ermittlung der verschiedenen Kundengruppen wird ein unsupervised Learning Algorithmus benötigt. Hier haben wir uns für k-means entschieden, da dies eine gute 
 Erklärbarkeit des Models gewährleistet. Da in diesem Projekt komplett auf Spark gesetzt wurde, wird auch das modelling mit Spark umgesetzt (siehe [K-Means](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.clustering.KMeans.html)).
 
