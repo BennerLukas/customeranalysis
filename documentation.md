@@ -48,23 +48,31 @@ Hierbei ergibt sich das insgesamt ein Umsatz von ca 50M € generiert wurde. Die
 
 ## Kombinierte Spaltenanalysen 
 ### Zeitpunkt-Analyse
-Primär wird die Abhängigkeit der Entscheidungsvariablen von dem Zeitpunkt analysiert.Hierbei fällt auf, dass die meisten Interaktionen in der Mitte des Monats (15.-17.) stattfinden. Dasselbe Verhalten ist auch am Umsatz erkennbar, der ebenfalls in der Mitte des Monats, besonders am 17., am größten ist. Hierbei ist der Umsatz am 17.November allerdings ungewöhnlich hoch, während für den 15.November gar kein Umsatz generiert wurde. Diese Ausreißer deuten auf einen Systemfehler zu dem entsprechenden Zeitpunkt hin. Nichtsdestotrotz ist eine deutliche Umsatzsteigerung in der Mitte des Monats ableitbar.
-Außerdem ist auch erkennbar, dass tendenziell mehr Aktivitäten am Wochende (Freitag bis Sonntag) stattfinden. Dies wird auch von dem Umsatz bestätigt, der am Sonntag am höchsten ist.
+Primär wird die Abhängigkeit der Entscheidungsvariablen von dem Zeitpunkt analysiert.Hierbei fällt auf, dass die meisten Interaktionen in der Mitte des Monats (15.-17.) stattfinden. 
+Dasselbe Verhalten ist auch am Umsatz erkennbar, der ebenfalls in der Mitte des Monats, besonders am 17., am größten ist. 
+Hierbei ist der Umsatz am 17. November allerdings ungewöhnlich hoch, während für den 15. November gar kein Umsatz generiert wurde. 
+Diese Ausreißer deuten auf einen Systemfehler zu dem entsprechenden Zeitpunkt hin. Nichtsdestotrotz ist eine deutliche Umsatzsteigerung in der Mitte des Monats ableitbar.
+Außerdem ist auch erkennbar, dass tendenziell mehr Aktivitäten am Wochenende (Freitag bis Sonntag) stattfinden. Dies wird auch von dem Umsatz bestätigt, der am Sonntag am höchsten ist.
 In der Tagesverteilung zeigen sich die Nachmittags-Stunden (15-18Uhr) als besonders interaktionsreich aus, während die Morgen- und Mittagsstunden (6-14Uhr) ein konstant hohes Interaktionsvolumen erreichen. Der Umsatz hingegen hat seinen Peak in der Morgens- und Mittagszeit. Hierbei sticht besonders die Uhrzeit 10 Uhr raus. 
 
 ### Produktanalysen
-In der Produktanalyse fällt auf, dass ein Category_Class immer mehrer Category_codes umfasst. Diese umfassen wiederrum mehrere Category_IDs, welche mehrere Produkt_IDs umfassen. Daraus ergibt sich die folgende Beziehung: Product_ID ⊂ Category_ID ⊂ Category_Code ⊂ Category_Class. Die Marken hingegen sind Klassenübergreifend. 
-Hierbei fällt ebenfalls aus, dass die Category_Class electronics am meisten Events aller Arten generiert, gefolgt von den appliances und den computers. Dieselbe Verteilung lässt sich auch an dem Umsatz erkennen. Gemessen am Umsatz hingegen, rutscht die Marke Apple nun auf den ersten Platz gefolgt von Samsung und Xiaomi. 
+In der Produktanalyse fällt auf, dass ein Category_Class immer mehrere Category_codes umfasst. Diese umfassen wiederum mehrere Category_IDs, welche mehrere Produkt_IDs umfassen. 
+Daraus ergibt sich die folgende Beziehung: Product_ID ⊂ Category_ID ⊂ Category_Code ⊂ Category_Class. Die Marken hingegen sind Klassenübergreifend. 
+Hierbei fällt ebenfalls aus, dass die Category_Class electronics am meisten Events aller Arten generiert, gefolgt von den appliances und den computers. 
+Dieselbe Verteilung lässt sich auch an dem Umsatz erkennen. Gemessen am Umsatz hingegen, rutscht die Marke Apple nun auf den ersten Platz gefolgt von Samsung und Xiaomi. 
 
 ### Useranalyse
-Innerhalb der Useranalyse fällt auf, dass der Online-Shop von Oktober mit 3,02M User nach November mit 3.696M User deutlich angewachsen ist. Hierbei hatten 1,4M User in beiden Monaten eine Interaktion mit dem Shop. Die User haben dabei zwischen 1 und 22.542 User-Sessions, wobei der Mittelwert bei 4.3 liegt. Ein User schaut sich dabei durchschnittlich 19.6 Produkte an, legt davon 0.7 in den Einkaufswagen und kauft davon 0.3. Pro Session werden dabei durchschnittlich 4.5 produkte angesehen, 1.7 in den Einkaufswagen gelegt und 1.18 gekauft. Die meisten Session finden am Wochende (Freitag-Sonntag) statt.
+Innerhalb der Useranalyse fällt auf, dass der Online-Shop von Oktober mit 3,02M User nach November mit 3.696M User deutlich angewachsen ist. 
+Hierbei hatten 1,4M User in beiden Monaten eine Interaktion mit dem Shop. Die User haben dabei zwischen 1 und 22.542 User-Sessions, wobei der Mittelwert bei 4.3 liegt. 
+Ein User schaut sich dabei durchschnittlich 19.6 Produkte an, legt davon 0.7 in den Einkaufswagen und kauft davon 0.3. 
+Die meisten Sessions finden am Wochenende (Freitag-Sonntag) statt.
 
-[@Phillip und Lukas: sind wir uns da sicher?]
-[@Lukas: Ist es richtig an der Stelle die Customer Profiles zu bilden?]
 
 ## Korrelationen
-Im letzten Schritt der Analyse werden die einzelnen Spalten nun innerhalb von Korrelationsmatrizen ins Verhältnis zu den Entscheidungsvariablen gesetzt und betrachtet. Hiermit sollen die vorherigen Erkenntnisse überprüft werden. Hierfür müssen die Spalten "hour", "dayofweek", "dayofmonth" und "category_class" in Kategorien one-hot-encoded werden.
-In der Tageszeit-Analyse ergibt sich eine positive Korrelation zwischen der Tageszeit "Morgens"(6-12Uhr) und dem Umsatz, der gekauften Menge und der in den Warenkorb hinzugefügten Menge. Die meisten Views hingegen ergeben sich eher in den Abendstunden zwischen 18 und 24 Uhr.
+Im letzten Schritt der Analyse werden die einzelnen Spalten nun innerhalb von Korrelationsmatrizen ins Verhältnis zu den Entscheidungsvariablen gesetzt und betrachtet. 
+Hiermit sollen die vorherigen Erkenntnisse überprüft werden. Hierfür müssen die Spalten "hour", "dayofweek", "dayofmonth" und "category_class" in Kategorien one-hot-encoded werden.
+In der Tageszeit-Analyse ergibt sich eine positive Korrelation zwischen der Tageszeit "Morgens"(6-12Uhr) und dem Umsatz, der gekauften Menge und der in den Warenkorb hinzugefügten Menge. 
+Die meisten Views hingegen ergeben sich eher in den Abendstunden zwischen 18 und 24 Uhr.
 Die Wochentags-Analyse erkannt ebenfalls eine positive Korrelation zwischen dem Sonntag und dem Umsatz, sowie der gekauften Menge. Die meisten Views entstehen zwischen Montag und Donnerstag, während am zwischen Freitag und Sonntag am meisten Produkte in den Warenkorb gelegt werden.
 In der Monats-Analyse wird eine positive Korrelation zwischen dem Ende des Monats(>=20.) und dem Umsatz und der gekauften Menge festgestellt. Angeschaut werden die Produkte überwiegend am Anfang und Ende des Monats und in den Warenkorb gelegt, in der Mitte des Monats. 
 Die Erkenntnisse aus den Korrelationsanalysen decken sich grob mit den Ergebnissen aus der vorherigen Zeitpunkt-Analyse.
