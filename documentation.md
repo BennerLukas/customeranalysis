@@ -3,7 +3,7 @@
 
 
 # Einführung 
-Das Projekt "customeranalysis" wird von der Gruppe "eShopper" durchgeführt. Diese besteht aus den Studenten Alina Buss (4163246), Phillip Lange (...) und Lukas Benner (...). Hierbei soll das Kundenverhalten innerhalb eines eShops analysiert werden, sodass im Nachhinein Kundensegmente ermittelt und EMpfehlungen ausgesprochen werden können.
+Das Projekt "customeranalysis" wird von der Gruppe "eShopper" durchgeführt. Diese besteht aus den Studenten Alina Buss (4163246), Phillip Lange (...) und Lukas Benner (6550912). Hierbei soll das Kundenverhalten innerhalb eines eShops analysiert werden, sodass im Nachhinein Kundensegmente ermittelt und EMpfehlungen ausgesprochen werden können.
 
 ## Datensatz
 Für das Projekt wird auf einen transaktionalen Datensatz von Kaggle zurückgegriffen. Dieser kann unter folgendem Link runtergeladen wurden: https://www.kaggle.com/mkechinov/ecommerce-behavior-data-from-multi-category-store. Dieser Datensatz umfasst jegliche Events des eShops in den Monaten Oktober und November 2019. Die Events wurden hierbei in die Kategorien "View", "Add to Cart" und "Purchase" unterteilt. Zusätzlich gibt es noch Informationen zu dem Event-Zeitpunkt, der Product-ID, der Category-ID, dem Category-Code, der Marke, dem Preis, der User-Id und der User-Session. Hierbei ergibt sich eine Gesamtgröße von ca. 14GB mit 100 Millionen Einträgen. Da die Analysen mit einem so großen Datensatz sehr langsam ausfallen, wurde zusätzlich ein repäsentatives sample mit nur 100.000 Einträgen erstellt.
