@@ -70,7 +70,29 @@ Bei der Preis-Analyse ist erkennbar, dass ein hoher Preis auch zu einem hohen Um
 # Modellierung
 
 ## Kaufverhalten 
-(Phillip)
+### Datenvorbereitung
+Der genutzte Algorithmus zur Assoziationsanalyse benötigt als Input eine Spalte mit Arrays. Diese Arrays müssen die jeweilig zu untersuchenden Elemente, 
+wie bspw. product_ids nach Aggregationselement beinhalten. So wird hier nach user_id aggregiert und die jeweiligen product_ids konkateniert in einen Array.
+
+### Training und Programm 
+Um auf dem großen Datensatz schneller eine Antwort zu erhalten als durch den sonst standardmäßigen Apriori-Algorithmus wurde auf den in PySpark implementierten [FPGrwoth](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.clustering.KMeans.html) zurückgegriffen,
+der eine bessere Performance auf größeren Datensätzen bietet. In der ersten Iteration wird hierbei eine Liste aus den einzelnen Elementen erstellt und nach Häufigkeit absteigend sortiert. 
+Im zweiten Schritt wird die Datenbasis in einen FP-Baum komprimiert. Erst dann wird dieser FP-Baum rekursiv analysiert um Elemente zu finden, die größer sind als der gegebene Support-Wert und auf Assoziationen untersucht. 
+Diese Schritte können jeweils parallelisiert werden. 
+Um eine performantere Version des Codes zu haben, wurde das explorative Notebook in ein Python-File umgeschrieben, indem über das native Modul „Logging“ Informationen zu den Verarbeitungsschritte ausgegeben werden. Weiterhin wurde dabei auf die Vereinigung der beiden Monatsdatensätze (Oktober und November) verzichtet, da die Bäume durch die geringe Support-Schwelle sehr groß werden und somit nicht mehr in den Hauptspeicher passen, was Performance und Ausführungsdauer vor allem bei der Suche nach Assoziationsregeln in product_ids nahezu unmöglich macht auf den gegebenen Testrechnern. 
+
+### Evaluieren der gefundenen Muster 
+Da die Ergebnisse aus der Analyse der Assoziationsregeln mit product_ids wenig sprechend sind, da den Produkten kein Name sondern nur eine Marke und Kategorie zugeordnet werden kann, wird im folgenden die Analyse der zusammengekauften category_codes vorgestellt. Es wurde ein Support von 0,001 und eine Confidence von 0,7 gewählt. Der Support wurde relativ hoch gewählt um Analysen auf unseren Rechnern zu erlauben, aber dennoch Assoziationsregeln in dem Datensatz zu finden.
+
+|antecedent |consequent |confidence |lift |support |
+--- | --- | --- | --- | ---
+[electronics.telephone, computers.notebook] |[electronics.smartphone]  |0.7818 |1.7454 |1.318E-4
+[computers.components.motherboard, computers.components.memory]  |[computers.components.cpu] |0.75 |1308.41|1.4714E-4
+[computers.components.cpu, computers.components.memory] |[computers.components.motherboard]|0.7619 |1380.87 |1.4714E-4
+[computers.notebook, electronics.clocks, electronics.audio.headphone] |[electronics.smartphone]  |0.7761 |1.73 |1.594E-4
+Diese Ergebnisse erscheinen logisch. Es ergibt Sinn, dass Personen die einen Prozessor und RAM kaufen auch ein Motherboard für den Prozessor benötigen. Diese Regel ist sowohl mit Prozessor als auch mit Motherboard als Folgekategorie vorhanden. Auch erklärbar ist, dass Personen, die Notebooks, Wearables, die vermutlich unter der Kategorie „electronis.clocks“ geführt werden und Kopfhörer kaufen auch ein dazugehöriges Smartphone kaufen. Hierbei wäre es interessant zu sehen, ob es sich hierbei um ausschließlich Produkte von Apple handelt, oder ob andere Produkte in die Assoziationsregel fallen.
+Weitere Schritte, die noch ausstehen sind erstens, die Bildung von Assoziationsregeln über beide Monaten und zweitens die Integration der gefundenen Regeln in die Umgebung des Online-Shops als Kaufempfehlungen. Dieses könnte dann ggf. Kundeninteraktionen erhöhen und potenziell zu mehr Verkäufen führen.
+
 
 ## Kunden-Cluster mit K-Means 
 
