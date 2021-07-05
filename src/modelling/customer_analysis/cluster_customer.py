@@ -31,7 +31,7 @@ class ClusterCustomer:
             self.data.export_to_csv(sdf_customer_profile, "data/customer_profile.csv")
         else:
             self.log.info("Read customer profile from CSV")
-            sdf_customer_profile = self.data.spark.read.csv("data/customer_profile_new.csv", header=True,
+            sdf_customer_profile = self.data.spark.read.csv("../../data/customer_profile.csv", header=True,
                                                             inferSchema=True)
             # sdf_customer_profile.printSchema()
 
@@ -172,7 +172,7 @@ class ClusterCustomer:
 
 if __name__ == "__main__":
     customer = ClusterCustomer()
-    train, test, dev = customer.prep_data(False)
+    train, test, dev = customer.prep_data(True)
     # result = customer.evaluate(train, test)
     result = customer.k_means(train, test)
     # print(result)

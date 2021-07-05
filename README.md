@@ -25,11 +25,11 @@ It contains user data from the months october and november 2019.
 
 ## Usage K-Means
 1. Execute cluster_customer.py
-2. In case of an error mkdir log inside modelling folder (for log-files)
-3. Check if ```train, test, dev = customer.prep_data(False)``` in line 175 is False so the data will be created from scratch.
-4. Coffee break! This will take some time
+2. In case of an error mkdir ```log``` inside modelling folder (empty folder for log-files won't be synced with git)
+3. Check if ```train, test, dev = customer.prep_data(False)``` in line 175 is False, so the data will be created from scratch.
+4. Coffee break! This will take some time ;)
 5. Rename the created csv (```data/customer_profile_new.csv```) file of the customer_profile inside the created folder and move it into ```src/data```
-
+6. Next time use the exported csv instead of the raw data. Therefore, set line 175 to ```True``` again.
 ## About the project
 
 ### Team
