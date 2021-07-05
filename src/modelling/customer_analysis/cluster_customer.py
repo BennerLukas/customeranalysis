@@ -172,7 +172,7 @@ class ClusterCustomer:
 
 if __name__ == "__main__":
     customer = ClusterCustomer()
-    train, test, dev = customer.prep_data(True)
+    train, test, dev = customer.prep_data(False)
     # result = customer.evaluate(train, test)
     result = customer.k_means(train, test)
     # print(result)

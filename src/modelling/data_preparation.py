@@ -45,7 +45,7 @@ class DataPreparation:
             .config("spark.driver.memory", f"16g") \
             .config("spark.memory.offHeap.enabled", True) \
             .config("spark.memory.offHeap.size", f"16g") \
-            .config("spark.sql.debug.maxToStringFields", f"16") \
+            .config("spark.sql.debug.maxToStringFields", f"2048") \
             .getOrCreate()
         sc = spark.sparkContext
         return spark, sc
