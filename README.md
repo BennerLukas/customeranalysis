@@ -57,3 +57,7 @@ More about Plotly see [here](https://plotly.com/).
 ## Documentation
 
 Our more explicit documentation (in German) can be found [here](https://github.com/BennerLukas/customeranalysis/blob/main/documentation.md)
+
+
+To find the interactive plots from plotly see ```src/data/exports``` and open the HTML-Files. 
+For more Plots change the branch to "notebook_runned" to see the results on the whole dataset (runtime >3h).
