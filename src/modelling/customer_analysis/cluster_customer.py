@@ -22,6 +22,12 @@ class ClusterCustomer:
                          "sum_views", "sum_purchases", "sum_carts", "avg(duration)")
 
     def prep_data(self, read_existing=True):
+        """
+        prepare data for clustering.
+
+        :param read_existing:
+        :return:
+        """
         if read_existing is False:
             self.log.info("Create customer profile vom scratch")
             sdf = self.data.read_standard_data()
@@ -44,6 +50,12 @@ class ClusterCustomer:
         return trainingData, testData, devData
 
     def vectorize(self, dataset, features=None):
+        """
+        vectorize the given data. Using pyspark DataFrame and returning it vectorized.
+        :param dataset:
+        :param features:
+        :return:
+        """
         self.log.info("Start vectorizing")
         if features is None:
             features = self.features
@@ -57,6 +69,11 @@ class ClusterCustomer:
         return dataset
 
     def scale(self, v_data):
+        """
+        Scale vectorized data with the MaxAbsolut Scaler from pyspark
+        :param v_data:
+        :return:
+        """
         self.log.info("Start scaling")
         scaler = MaxAbsScaler(inputCol="features", outputCol="scaled_features")
         scaled_data = scaler.fit(v_data)
@@ -66,6 +83,13 @@ class ClusterCustomer:
         return scaled_data_ouptut
 
     def k_means(self, trainData, testData, k=10):
+        """
+        K-Means model function for train, test and basic evaluation.
+        :param trainData:
+        :param testData:
+        :param k:
+        :return:
+        """
         # v_trainData = self.vectorize(trainData)
         # v_testData = self.vectorize(testData)
 
@@ -102,6 +126,12 @@ class ClusterCustomer:
         return model, silhouette, centers, predictions, cost
 
     def evaluate(self, trainData, testData):
+        """
+        loop over k-means function for many iterations and makes ellbow-curve.
+        :param trainData:
+        :param testData:
+        :return:
+        """
         k_values = []
         cost_values = []
         for k in range(2, 50, 2):
@@ -119,6 +149,12 @@ class ClusterCustomer:
         return df_cost
 
     def visualize(self, model, predictions):
+        """
+        Visualize the result of a prediction in 2D and in bar-chart format.
+        :param model:
+        :param predictions:
+        :return:
+        """
         self.log.info("Visualize result")
         # predictions.show()
         predictions = predictions.withColumn("predicted_group",

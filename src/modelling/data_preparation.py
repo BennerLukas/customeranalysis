@@ -11,6 +11,13 @@ class DataPreparation:
 
     @staticmethod
     def set_logger(name, mode=logging.INFO):
+        """
+        Make Log-File and PrettyPrints.
+
+        :param name:
+        :param mode:
+        :return:
+        """
         log_format = '[DataExplo][%(asctime)s][%(threadName)-12.12s][%(levelname)-8s][%(name)-12s] %(message)s'
 
         logging.basicConfig(
@@ -35,6 +42,11 @@ class DataPreparation:
         return logger
 
     def create_spark_session(self):
+        """
+        Makes or gets spark session and returns spark
+
+        :return:
+        """
         self.log.info("Create Spark Session")
         # spark = pyspark.sql.SparkSession.builder.appName("app1").getOrCreate()
         spark = pyspark.sql.SparkSession \
@@ -51,6 +63,12 @@ class DataPreparation:
         return spark, sc
 
     def add_feature_engineering(self, sdf):
+        """
+        adds feature engineering developed in exploration.ipynb.
+
+        :param sdf:
+        :return:
+        """
         self.log.info("Start feature engineering")
         # Feature Splitting
         # sdf = sdf.withColumn("category_class", f.substring_index(sdf.category_code, '.', 1))
@@ -87,6 +105,12 @@ class DataPreparation:
         return sdf
 
     def make_session_profiles(self, sdf):
+        """
+        aggregate raw data into session profiles.
+
+        :param sdf:
+        :return:
+        """
         self.log.info("Create Session Profiles")
         sdf_session = sdf.select("user_id", "user_session", "event_type", "product_id", "price", "event_time",
                                  'purchases', 'views', 'carts')
@@ -116,6 +140,11 @@ class DataPreparation:
         return sdf_session_agg
 
     def make_customer_profiles(self, sdf_session_agg):
+        """
+        aggregate session data into customer data.
+        :param sdf_session_agg:
+        :return:
+        """
         self.log.info("Create Customer Profiles")
         sdf_session_agg.show()
         sdf_customer_profile = sdf_session_agg.groupBy("user_id").agg(f.sum("sum(events)").alias("sum_events"),
@@ -140,6 +169,14 @@ class DataPreparation:
         return sdf_customer_profile
 
     def export_to_csv(self, sdf, path="data/customer_profile.csv"):
+        """
+        export the customer data into a csv.
+        Will be in a seperate directory. Needs to be moved and renamed (see README).
+
+        :param sdf:
+        :param path:
+        :return:
+        """
         self.log.info(f"Export data to {path}")
         sdf_export = sdf.withColumn("bought_product", sdf["bought_product"].cast(pyspark.sql.types.StringType()))
         sdf_export = sdf_export.withColumn("user_sessions",
@@ -150,6 +187,12 @@ class DataPreparation:
         return True
 
     def read_standard_data(self, small_dataset=False):
+        """
+        read the raw data given its on the defined location (see README).
+
+        :param small_dataset:
+        :return:
+        """
         if not small_dataset:
             sdf_201911 = self.spark.read.csv("../../data/2019-Nov.csv", header=True, inferSchema=True)
             sdf_201910 = self.spark.read.csv("../../data/2019-Oct.csv", header=True, inferSchema=True)
