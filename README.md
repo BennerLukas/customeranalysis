@@ -36,7 +36,7 @@ File: ```/modelling/product_analysis/product_fpm.py```
 1. To use the entire dataset set ``small_dataset=False`` in line 70
 2. To filter the data on the event_type column one can set the filter_element in line 71 to be either purchases, carts, or views
 3. The "focus" element in line 71 is the column that is used for the pattern mining. Useful columns to analyse are "product_id" and "category_code".
-4. The parameters used in line 72 are directly used into the default [fpgrowth](https://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.ml.fpm.FPGrowth.html#pyspark.ml.fpm.FPGrowth) model from pyspark.
+4. The parameters used in line 72 are directly used in the default [fpgrowth](https://spark.apache.org/docs/3.1.1/api/python/reference/api/pyspark.ml.fpm.FPGrowth.html#pyspark.ml.fpm.FPGrowth) model from pyspark.
 
 
 ## About the project
