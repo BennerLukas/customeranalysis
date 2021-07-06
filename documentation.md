@@ -1,7 +1,5 @@
 # Dokumentation für eShopper
 
-
-
 # Einführung 
 Das Projekt "customeranalysis" wird von der Gruppe "eShopper" durchgeführt. 
 Diese besteht aus den Studenten Alina Buss (4163246), Phillip Lange (5920414) und Lukas Benner (6550912). 
