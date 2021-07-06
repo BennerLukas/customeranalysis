@@ -69,5 +69,5 @@ if __name__ == "__main__":
     fpm = FrequencyPatternMining()
     sdf = fpm.prep_data(small_dataset=True)
     sdf = fpm.shape_data(sdf, filter_element="purchases", focus="category_sub_sub_class")
-    model = fpm.train(sdf, min_support=0.0001)
+    model = fpm.train(sdf, min_support=0.0001, min_confidence=0.7)
     pass

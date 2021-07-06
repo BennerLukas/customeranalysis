@@ -94,6 +94,8 @@ um Analysen auf unseren Rechnern zu erlauben, aber dennoch Assoziationsregeln in
 [computers.notebook, electronics.clocks, electronics.audio.headphone] |[electronics.smartphone]  |0.7761 |1.73 |1.594E-4
 Diese Ergebnisse erscheinen logisch. Es ergibt Sinn, dass Personen die einen Prozessor und RAM kaufen auch ein Motherboard für den Prozessor benötigen. Diese Regel ist sowohl mit Prozessor als auch mit Motherboard als Folgekategorie vorhanden. Auch erklärbar ist, dass Personen, die Notebooks, Wearables, 
 die vermutlich unter der Kategorie „electronis.clocks“ geführt werden und Kopfhörer kaufen auch ein dazugehöriges Smartphone kaufen. Hierbei wäre es interessant zu sehen, ob es sich hierbei um ausschließlich Produkte von Apple handelt, oder ob andere Produkte in die Assoziationsregel fallen.
+
+
 Weitere Schritte, die noch ausstehen sind, erstens, die Bildung von Assoziationsregeln über beide Monaten und zweitens die Integration der gefundenen Regeln in die Umgebung des Online-Shops als Kaufempfehlungen. Dieses könnte dann ggf. Kundeninteraktionen erhöhen und potenziell zu mehr Verkäufen führen.
 
 
